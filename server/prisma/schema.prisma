@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 enum UserRole {
@@ -112,13 +111,13 @@ model Ticket {
   status       TicketStatus   @default(OPEN)
 
   requesterId String
-  requester   User @relation("TicketRequester", fields: [requesterId], references: [id], onDelete: Restrict)
+  requester   User   @relation("TicketRequester", fields: [requesterId], references: [id], onDelete: Restrict)
 
   technicianId String?
-  technician   User? @relation("TicketTechnician", fields: [technicianId], references: [id], onDelete: SetNull)
+  technician   User?   @relation("TicketTechnician", fields: [technicianId], references: [id], onDelete: SetNull)
 
   assetId String?
-  asset   Asset? @relation(fields: [assetId], references: [id], onDelete: SetNull)
+  asset   Asset?  @relation(fields: [assetId], references: [id], onDelete: SetNull)
 
   dueAt      DateTime?
   resolvedAt DateTime?
@@ -148,7 +147,7 @@ model TicketComment {
   ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
 
   authorId String
-  author   User @relation("CommentAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+  author   User   @relation("CommentAuthor", fields: [authorId], references: [id], onDelete: Restrict)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -171,7 +170,7 @@ model TicketActivity {
   ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
 
   actorId String?
-  actor   User? @relation("ActivityActor", fields: [actorId], references: [id], onDelete: SetNull)
+  actor   User?   @relation("ActivityActor", fields: [actorId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
 
@@ -195,7 +194,7 @@ model Asset {
   notes              String?
 
   assignedUserId String?
-  assignedUser   User? @relation("AssetAssignedUser", fields: [assignedUserId], references: [id], onDelete: SetNull)
+  assignedUser   User?   @relation("AssetAssignedUser", fields: [assignedUserId], references: [id], onDelete: SetNull)
 
   tickets Ticket[]
 
