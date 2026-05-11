@@ -4,6 +4,7 @@ import healthRoutes from "./routes/health.routes";
 import userRoutes from "./routes/users.routes";
 import assetRoutes from "./routes/assets.routes";
 import ticketRoutes from "./routes/tickets.routes";
+import dashboardRoutes from "./routes/dashboard.routes";
 import { errorHandler } from "./middleware/errorHandler";
 
 export const app = express();
@@ -21,6 +22,7 @@ app.use("/api/health", healthRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/assets", assetRoutes);
 app.use("/api/tickets", ticketRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
