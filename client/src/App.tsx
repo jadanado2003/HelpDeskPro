@@ -9,8 +9,10 @@ import {
   Laptop,
   LayoutDashboard,
   Ticket,
+  type LucideIcon,
 } from "lucide-react";
 import "./index.css";
+import { TicketsPage } from "./pages/TicketsPage";
 
 type DashboardStats = {
   summary: {
@@ -68,6 +70,8 @@ type ApiResponse<T> = {
   data: T;
 };
 
+type ActivePage = "dashboard" | "tickets";
+
 const API_BASE_URL = "http://localhost:5000/api";
 
 function formatLabel(value: string) {
@@ -87,7 +91,7 @@ function StatCard({
   title: string;
   value: number;
   description: string;
-  icon: typeof Ticket;
+  icon: LucideIcon;
 }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -106,6 +110,7 @@ function StatCard({
 }
 
 function App() {
+  const [activePage, setActivePage] = useState<ActivePage>("dashboard");
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -145,18 +150,39 @@ function App() {
           </div>
 
           <nav className="mt-10 space-y-2">
-            <a className="flex items-center gap-3 rounded-xl bg-white/10 px-4 py-3 text-sm font-medium text-white">
+            <button
+              type="button"
+              onClick={() => setActivePage("dashboard")}
+              className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium ${
+                activePage === "dashboard"
+                  ? "bg-white/10 text-white"
+                  : "text-slate-300 hover:bg-white/5 hover:text-white"
+              }`}
+            >
               <LayoutDashboard size={18} />
               Dashboard
-            </a>
-            <a className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300">
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActivePage("tickets")}
+              className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium ${
+                activePage === "tickets"
+                  ? "bg-white/10 text-white"
+                  : "text-slate-300 hover:bg-white/5 hover:text-white"
+              }`}
+            >
               <Ticket size={18} />
               Tickets
-            </a>
-            <a className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300">
+            </button>
+
+            <button
+              type="button"
+              className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium text-slate-300 hover:bg-white/5 hover:text-white"
+            >
               <Boxes size={18} />
               Assets
-            </a>
+            </button>
           </nav>
 
           <div className="mt-10 rounded-2xl bg-white/10 p-4">
@@ -169,147 +195,163 @@ function App() {
         </aside>
 
         <main className="flex-1 px-5 py-6 lg:px-8">
-          <header className="mb-8 flex flex-col justify-between gap-4 rounded-2xl bg-white p-6 shadow-sm lg:flex-row lg:items-center">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-blue-600">
-                Dashboard
-              </p>
-              <h2 className="mt-2 text-3xl font-bold text-slate-950">
-                HelpDeskPro Overview
-              </h2>
-              <p className="mt-2 text-slate-500">
-                Live dashboard data from your Express API and Supabase
-                PostgreSQL database.
-              </p>
-            </div>
+          {activePage === "tickets" && <TicketsPage />}
 
-            <div className="rounded-xl bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
-              API connected
-            </div>
-          </header>
-
-          {isLoading && (
-            <div className="rounded-2xl bg-white p-6 shadow-sm">
-              Loading dashboard data...
-            </div>
-          )}
-
-          {errorMessage && (
-            <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
-              {errorMessage}
-            </div>
-          )}
-
-          {stats && (
+          {activePage === "dashboard" && (
             <>
-              <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-                <StatCard
-                  title="Total Tickets"
-                  value={stats.summary.totalTickets}
-                  description="All support requests"
-                  icon={Ticket}
-                />
-                <StatCard
-                  title="In Progress"
-                  value={stats.summary.inProgressTickets}
-                  description="Currently being worked on"
-                  icon={Clock3}
-                />
-                <StatCard
-                  title="Critical Tickets"
-                  value={stats.summary.criticalTickets}
-                  description="Highest priority issues"
-                  icon={AlertTriangle}
-                />
-                <StatCard
-                  title="Total Assets"
-                  value={stats.summary.totalAssets}
-                  description="Tracked IT equipment"
-                  icon={Laptop}
-                />
-              </section>
-
-              <section className="mt-6 grid gap-6 xl:grid-cols-3">
-                <div className="rounded-2xl bg-white p-6 shadow-sm xl:col-span-2">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-bold text-slate-950">
-                        Recent Tickets
-                      </h3>
-                      <p className="mt-1 text-sm text-slate-500">
-                        Latest support requests from the API.
-                      </p>
-                    </div>
-                    <Activity className="text-slate-400" size={22} />
-                  </div>
-
-                  <div className="mt-5 overflow-x-auto">
-                    <table className="w-full border-collapse text-left text-sm">
-                      <thead>
-                        <tr className="border-b border-slate-200 text-slate-500">
-                          <th className="py-3 pr-4 font-semibold">Ticket</th>
-                          <th className="py-3 pr-4 font-semibold">Title</th>
-                          <th className="py-3 pr-4 font-semibold">Priority</th>
-                          <th className="py-3 pr-4 font-semibold">Status</th>
-                          <th className="py-3 pr-4 font-semibold">Requester</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {stats.recentTickets.map((ticket) => (
-                          <tr
-                            key={ticket.id}
-                            className="border-b border-slate-100 text-slate-700"
-                          >
-                            <td className="py-3 pr-4 font-medium text-slate-950">
-                              {ticket.ticketNumber}
-                            </td>
-                            <td className="py-3 pr-4">{ticket.title}</td>
-                            <td className="py-3 pr-4">
-                              {formatLabel(ticket.priority)}
-                            </td>
-                            <td className="py-3 pr-4">
-                              {formatLabel(ticket.status)}
-                            </td>
-                            <td className="py-3 pr-4">
-                              {ticket.requester.fullName}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+              <header className="mb-8 flex flex-col justify-between gap-4 rounded-2xl bg-white p-6 shadow-sm lg:flex-row lg:items-center">
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-wide text-blue-600">
+                    Dashboard
+                  </p>
+                  <h2 className="mt-2 text-3xl font-bold text-slate-950">
+                    HelpDeskPro Overview
+                  </h2>
+                  <p className="mt-2 text-slate-500">
+                    Live dashboard data from your Express API and Supabase
+                    PostgreSQL database.
+                  </p>
                 </div>
 
+                <div className="rounded-xl bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
+                  API connected
+                </div>
+              </header>
+
+              {isLoading && (
                 <div className="rounded-2xl bg-white p-6 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-bold text-slate-950">
-                        Ticket Status
-                      </h3>
-                      <p className="mt-1 text-sm text-slate-500">
-                        Current ticket distribution.
-                      </p>
-                    </div>
-                    <CheckCircle2 className="text-slate-400" size={22} />
-                  </div>
-
-                  <div className="mt-5 space-y-4">
-                    {stats.charts.ticketsByStatus.map((item) => (
-                      <div
-                        key={item.status}
-                        className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3"
-                      >
-                        <span className="text-sm font-medium text-slate-700">
-                          {formatLabel(item.status)}
-                        </span>
-                        <span className="rounded-full bg-slate-900 px-3 py-1 text-sm font-bold text-white">
-                          {item.count}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+                  Loading dashboard data...
                 </div>
-              </section>
+              )}
+
+              {errorMessage && (
+                <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
+                  {errorMessage}
+                </div>
+              )}
+
+              {stats && (
+                <>
+                  <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                    <StatCard
+                      title="Total Tickets"
+                      value={stats.summary.totalTickets}
+                      description="All support requests"
+                      icon={Ticket}
+                    />
+                    <StatCard
+                      title="In Progress"
+                      value={stats.summary.inProgressTickets}
+                      description="Currently being worked on"
+                      icon={Clock3}
+                    />
+                    <StatCard
+                      title="Critical Tickets"
+                      value={stats.summary.criticalTickets}
+                      description="Highest priority issues"
+                      icon={AlertTriangle}
+                    />
+                    <StatCard
+                      title="Total Assets"
+                      value={stats.summary.totalAssets}
+                      description="Tracked IT equipment"
+                      icon={Laptop}
+                    />
+                  </section>
+
+                  <section className="mt-6 grid gap-6 xl:grid-cols-3">
+                    <div className="rounded-2xl bg-white p-6 shadow-sm xl:col-span-2">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-lg font-bold text-slate-950">
+                            Recent Tickets
+                          </h3>
+                          <p className="mt-1 text-sm text-slate-500">
+                            Latest support requests from the API.
+                          </p>
+                        </div>
+                        <Activity className="text-slate-400" size={22} />
+                      </div>
+
+                      <div className="mt-5 overflow-x-auto">
+                        <table className="w-full border-collapse text-left text-sm">
+                          <thead>
+                            <tr className="border-b border-slate-200 text-slate-500">
+                              <th className="py-3 pr-4 font-semibold">
+                                Ticket
+                              </th>
+                              <th className="py-3 pr-4 font-semibold">
+                                Title
+                              </th>
+                              <th className="py-3 pr-4 font-semibold">
+                                Priority
+                              </th>
+                              <th className="py-3 pr-4 font-semibold">
+                                Status
+                              </th>
+                              <th className="py-3 pr-4 font-semibold">
+                                Requester
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {stats.recentTickets.map((ticket) => (
+                              <tr
+                                key={ticket.id}
+                                className="border-b border-slate-100 text-slate-700"
+                              >
+                                <td className="py-3 pr-4 font-medium text-slate-950">
+                                  {ticket.ticketNumber}
+                                </td>
+                                <td className="py-3 pr-4">{ticket.title}</td>
+                                <td className="py-3 pr-4">
+                                  {formatLabel(ticket.priority)}
+                                </td>
+                                <td className="py-3 pr-4">
+                                  {formatLabel(ticket.status)}
+                                </td>
+                                <td className="py-3 pr-4">
+                                  {ticket.requester.fullName}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl bg-white p-6 shadow-sm">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-lg font-bold text-slate-950">
+                            Ticket Status
+                          </h3>
+                          <p className="mt-1 text-sm text-slate-500">
+                            Current ticket distribution.
+                          </p>
+                        </div>
+                        <CheckCircle2 className="text-slate-400" size={22} />
+                      </div>
+
+                      <div className="mt-5 space-y-4">
+                        {stats.charts.ticketsByStatus.map((item) => (
+                          <div
+                            key={item.status}
+                            className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3"
+                          >
+                            <span className="text-sm font-medium text-slate-700">
+                              {formatLabel(item.status)}
+                            </span>
+                            <span className="rounded-full bg-slate-900 px-3 py-1 text-sm font-bold text-white">
+                              {item.count}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </section>
+                </>
+              )}
             </>
           )}
         </main>
