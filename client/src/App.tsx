@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import "./index.css";
 import { TicketsPage } from "./pages/TicketsPage";
+import { AssetsPage } from "./pages/AssetsPage";
 
 type DashboardStats = {
   summary: {
@@ -70,7 +71,7 @@ type ApiResponse<T> = {
   data: T;
 };
 
-type ActivePage = "dashboard" | "tickets";
+type ActivePage = "dashboard" | "tickets" | "assets";
 
 const API_BASE_URL = "http://localhost:5000/api";
 
@@ -178,11 +179,17 @@ function App() {
 
             <button
               type="button"
-              className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium text-slate-300 hover:bg-white/5 hover:text-white"
+              onClick={() => setActivePage("assets")}
+              className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium ${
+                activePage === "assets"
+                  ? "bg-white/10 text-white"
+                  : "text-slate-300 hover:bg-white/5 hover:text-white"
+              }`}
             >
               <Boxes size={18} />
               Assets
             </button>
+
           </nav>
 
           <div className="mt-10 rounded-2xl bg-white/10 p-4">
@@ -196,6 +203,7 @@ function App() {
 
         <main className="flex-1 px-5 py-6 lg:px-8">
           {activePage === "tickets" && <TicketsPage />}
+          {activePage === "assets" && <AssetsPage />}
 
           {activePage === "dashboard" && (
             <>
