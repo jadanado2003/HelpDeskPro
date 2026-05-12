@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { AlertCircle, Search, Ticket } from "lucide-react";
+import { AlertCircle, Eye, Search, Ticket } from "lucide-react";
 
 type TicketRecord = {
   id: string;
@@ -49,38 +49,24 @@ function formatLabel(value: string) {
 }
 
 function getPriorityClass(priority: string) {
-  if (priority === "CRITICAL") {
-    return "bg-red-50 text-red-700 ring-red-200";
-  }
-
-  if (priority === "HIGH") {
-    return "bg-orange-50 text-orange-700 ring-orange-200";
-  }
-
-  if (priority === "MEDIUM") {
-    return "bg-yellow-50 text-yellow-700 ring-yellow-200";
-  }
-
+  if (priority === "CRITICAL") return "bg-red-50 text-red-700 ring-red-200";
+  if (priority === "HIGH") return "bg-orange-50 text-orange-700 ring-orange-200";
+  if (priority === "MEDIUM") return "bg-yellow-50 text-yellow-700 ring-yellow-200";
   return "bg-slate-50 text-slate-700 ring-slate-200";
 }
 
 function getStatusClass(status: string) {
-  if (status === "OPEN") {
-    return "bg-blue-50 text-blue-700 ring-blue-200";
-  }
-
-  if (status === "IN_PROGRESS") {
-    return "bg-purple-50 text-purple-700 ring-purple-200";
-  }
-
-  if (status === "RESOLVED") {
-    return "bg-green-50 text-green-700 ring-green-200";
-  }
-
+  if (status === "OPEN") return "bg-blue-50 text-blue-700 ring-blue-200";
+  if (status === "IN_PROGRESS") return "bg-purple-50 text-purple-700 ring-purple-200";
+  if (status === "RESOLVED") return "bg-green-50 text-green-700 ring-green-200";
   return "bg-slate-50 text-slate-700 ring-slate-200";
 }
 
-export function TicketsPage() {
+export function TicketsPage({
+  onViewTicket,
+}: {
+  onViewTicket: (ticketId: string) => void;
+}) {
   const [tickets, setTickets] = useState<TicketRecord[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -191,6 +177,7 @@ export function TicketsPage() {
                   <th className="py-3 pr-4 font-semibold">Requester</th>
                   <th className="py-3 pr-4 font-semibold">Technician</th>
                   <th className="py-3 pr-4 font-semibold">Asset</th>
+                  <th className="py-3 pr-4 font-semibold">Action</th>
                 </tr>
               </thead>
 
@@ -231,6 +218,16 @@ export function TicketsPage() {
                       {ticket.asset
                         ? `${ticket.asset.assetTag} - ${ticket.asset.name}`
                         : "No asset linked"}
+                    </td>
+                    <td className="py-4 pr-4">
+                      <button
+                        type="button"
+                        onClick={() => onViewTicket(ticket.id)}
+                        className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 ring-1 ring-blue-200 transition hover:bg-blue-100"
+                      >
+                        <Eye size={15} />
+                        View
+                      </button>
                     </td>
                   </tr>
                 ))}

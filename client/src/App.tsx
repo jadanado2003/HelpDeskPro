@@ -16,6 +16,7 @@ import "./index.css";
 import { TicketsPage } from "./pages/TicketsPage";
 import { AssetsPage } from "./pages/AssetsPage";
 import { CreateTicketPage } from "./pages/CreateTicketPage";
+import { TicketDetailPage } from "./pages/TicketDetailPage";
 
 type DashboardStats = {
   summary: {
@@ -73,7 +74,12 @@ type ApiResponse<T> = {
   data: T;
 };
 
-type ActivePage = "dashboard" | "tickets" | "assets" | "create-ticket";
+type ActivePage =
+  | "dashboard"
+  | "tickets"
+  | "assets"
+  | "create-ticket"
+  | "ticket-detail";
 
 const API_BASE_URL = "http://localhost:5000/api";
 
@@ -114,6 +120,7 @@ function StatCard({
 
 function App() {
   const [activePage, setActivePage] = useState<ActivePage>("dashboard");
+  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -217,9 +224,22 @@ function App() {
         </aside>
 
         <main className="flex-1 px-5 py-6 lg:px-8">
-          {activePage === "tickets" && <TicketsPage />}
+          {activePage === "tickets" && (
+            <TicketsPage
+              onViewTicket={(ticketId) => {
+                setSelectedTicketId(ticketId);
+                setActivePage("ticket-detail");
+              }}
+            />
+          )}
           {activePage === "assets" && <AssetsPage />}
           {activePage === "create-ticket" && <CreateTicketPage />}
+          {activePage === "ticket-detail" && selectedTicketId && (
+            <TicketDetailPage
+              ticketId={selectedTicketId}
+              onBack={() => setActivePage("tickets")}
+            />
+          )}
 
           {activePage === "dashboard" && (
             <>
