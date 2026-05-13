@@ -11,6 +11,7 @@ import {
   PlusCircle,
   Ticket,
   Users,
+  UserPlus,
   type LucideIcon,
 } from "lucide-react";
 import "./index.css";
@@ -21,6 +22,7 @@ import { TicketDetailPage } from "./pages/TicketDetailPage";
 import { CreateAssetPage } from "./pages/CreateAssetPage";
 import { AssetDetailPage } from "./pages/AssetDetailPage";
 import { UsersPage } from "./pages/UsersPage";
+import { CreateUserPage } from "./pages/CreateUserPage";
 
 type DashboardStats = {
   summary: {
@@ -81,6 +83,7 @@ type ApiResponse<T> = {
   type ActivePage =
   | "dashboard"
   | "users"
+  | "create-user"
   | "tickets"
   | "assets"
   | "create-ticket"
@@ -196,6 +199,19 @@ function App() {
 
             <button
               type="button"
+              onClick={() => setActivePage("create-user")}
+              className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium ${
+                activePage === "create-user"
+                ? "bg-white/10 text-white"
+                : "text-slate-300 hover:bg-white/5 hover:text-white"
+              }`}
+            >
+              <UserPlus size={18} />
+              Create User
+            </button>
+
+            <button
+              type="button"
               onClick={() => setActivePage("tickets")}
               className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium ${
                 activePage === "tickets"
@@ -290,6 +306,7 @@ function App() {
             />
           )}
           {activePage === "users" && <UsersPage />}
+          {activePage === "create-user" && <CreateUserPage />}
 
           {activePage === "dashboard" && (
             <>
