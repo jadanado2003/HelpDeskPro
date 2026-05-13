@@ -12,6 +12,7 @@ import {
   Ticket,
   Users,
   UserPlus,
+  LogOut,
   type LucideIcon,
 } from "lucide-react";
 import "./index.css";
@@ -23,6 +24,7 @@ import { CreateAssetPage } from "./pages/CreateAssetPage";
 import { AssetDetailPage } from "./pages/AssetDetailPage";
 import { UsersPage } from "./pages/UsersPage";
 import { CreateUserPage } from "./pages/CreateUserPage";
+import { LoginPage } from "./pages/LoginPage";
 
 type DashboardStats = {
   summary: {
@@ -78,6 +80,16 @@ type DashboardStats = {
 type ApiResponse<T> = {
   success: boolean;
   data: T;
+};
+
+type AuthUser = {
+  id: string;
+  fullName: string;
+  email: string;
+  role: string;
+  department: string | null;
+  jobTitle: string | null;
+  isActive: boolean;
 };
 
   type ActivePage =
@@ -136,6 +148,43 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
+  const [authToken, setAuthToken] = useState<string | null>(() =>
+    localStorage.getItem("helpdeskpro_token")
+  );
+
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(() => {
+  const storedUser = localStorage.getItem("helpdeskpro_user");
+
+  if (!storedUser) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(storedUser) as AuthUser;
+  } catch {
+    localStorage.removeItem("helpdeskpro_user");
+    return null;
+  }
+});
+
+function handleLogin(token: string, user: AuthUser) {
+  localStorage.setItem("helpdeskpro_token", token);
+  localStorage.setItem("helpdeskpro_user", JSON.stringify(user));
+  setAuthToken(token);
+  setCurrentUser(user);
+  setActivePage("dashboard");
+}
+
+function handleLogout() {
+  localStorage.removeItem("helpdeskpro_token");
+  localStorage.removeItem("helpdeskpro_user");
+  setAuthToken(null);
+  setCurrentUser(null);
+  setActivePage("dashboard");
+  setSelectedTicketId(null);
+  setSelectedAssetId(null);
+}
+
   useEffect(() => {
     async function loadDashboardStats() {
       try {
@@ -155,6 +204,10 @@ function App() {
 
     loadDashboardStats();
   }, []);
+
+    if (!authToken || !currentUser) {
+      return <LoginPage onLogin={handleLogin} />;
+    }
 
   return (
     <div className="min-h-screen bg-slate-100">
@@ -265,12 +318,23 @@ function App() {
           </nav>
 
           <div className="mt-10 rounded-2xl bg-white/10 p-4">
-            <p className="text-sm font-semibold">Portfolio demo</p>
-            <p className="mt-2 text-sm leading-6 text-slate-300">
-              Full-stack IT ticketing and asset management system using React,
-              TypeScript, Express, Prisma, and PostgreSQL.
+            <p className="text-sm font-semibold">{currentUser.fullName}</p>
+            <p className="mt-1 text-sm text-slate-300">{currentUser.email}</p>
+            <p className="mt-2 inline-flex rounded-full bg-blue-500/20 px-3 py-1 text-xs font-bold text-blue-100">
+              {currentUser.role}
             </p>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-3 text-sm font-bold text-white transition hover:bg-white/20"
+            >
+              <LogOut size={17} />
+              Logout
+            </button>
           </div>
+
+
         </aside>
 
         <main className="flex-1 px-5 py-6 lg:px-8">
