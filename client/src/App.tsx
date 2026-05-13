@@ -17,6 +17,7 @@ import { TicketsPage } from "./pages/TicketsPage";
 import { AssetsPage } from "./pages/AssetsPage";
 import { CreateTicketPage } from "./pages/CreateTicketPage";
 import { TicketDetailPage } from "./pages/TicketDetailPage";
+import { CreateAssetPage } from "./pages/CreateAssetPage";
 
 type DashboardStats = {
   summary: {
@@ -74,11 +75,12 @@ type ApiResponse<T> = {
   data: T;
 };
 
-type ActivePage =
+  type ActivePage =
   | "dashboard"
   | "tickets"
   | "assets"
   | "create-ticket"
+  | "create-asset"
   | "ticket-detail";
 
 const API_BASE_URL = "http://localhost:5000/api";
@@ -201,6 +203,19 @@ function App() {
 
             <button
               type="button"
+              onClick={() => setActivePage("create-asset")}
+              className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium ${
+                activePage === "create-asset"
+                  ? "bg-white/10 text-white"
+                  : "text-slate-300 hover:bg-white/5 hover:text-white"
+              }`}
+            >
+              <PlusCircle size={18} />
+              Create Asset
+            </button>
+
+            <button
+              type="button"
               onClick={() => setActivePage("assets")}
               className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium ${
                 activePage === "assets"
@@ -234,6 +249,7 @@ function App() {
           )}
           {activePage === "assets" && <AssetsPage />}
           {activePage === "create-ticket" && <CreateTicketPage />}
+          {activePage === "create-asset" && <CreateAssetPage />}
           {activePage === "ticket-detail" && selectedTicketId && (
             <TicketDetailPage
               ticketId={selectedTicketId}
