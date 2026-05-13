@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { AlertCircle, Boxes, Search } from "lucide-react";
+import { AlertCircle, Boxes, Eye, Search } from "lucide-react";
 
 type AssetRecord = {
   id: string;
@@ -83,7 +83,12 @@ function getConditionClass(condition: string) {
   return "bg-red-50 text-red-700 ring-red-200";
 }
 
-export function AssetsPage() {
+export function AssetsPage({
+  onViewAsset,
+}: {
+  onViewAsset: (assetId: string) => void;
+}) {
+
   const [assets, setAssets] = useState<AssetRecord[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -193,6 +198,7 @@ export function AssetsPage() {
                   <th className="py-3 pr-4 font-semibold">Location</th>
                   <th className="py-3 pr-4 font-semibold">Assigned User</th>
                   <th className="py-3 pr-4 font-semibold">Warranty Expiry</th>
+                  <th className="py-3 pr-4 font-semibold">Action</th>
                 </tr>
               </thead>
 
@@ -234,6 +240,16 @@ export function AssetsPage() {
                     <td className="py-4 pr-4">
                       {formatDate(asset.warrantyExpiryDate)}
                     </td>
+                      <td className="py-4 pr-4">
+                        <button
+                          type="button"
+                          onClick={() => onViewAsset(asset.id)}
+                          className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 ring-1 ring-blue-200 transition hover:bg-blue-100"
+                        >
+                          <Eye size={15} />
+                          View
+                        </button>
+                      </td>
                   </tr>
                 ))}
               </tbody>

@@ -18,6 +18,7 @@ import { AssetsPage } from "./pages/AssetsPage";
 import { CreateTicketPage } from "./pages/CreateTicketPage";
 import { TicketDetailPage } from "./pages/TicketDetailPage";
 import { CreateAssetPage } from "./pages/CreateAssetPage";
+import { AssetDetailPage } from "./pages/AssetDetailPage";
 
 type DashboardStats = {
   summary: {
@@ -81,7 +82,8 @@ type ApiResponse<T> = {
   | "assets"
   | "create-ticket"
   | "create-asset"
-  | "ticket-detail";
+  | "ticket-detail"
+  | "asset-detail";
 
 const API_BASE_URL = "http://localhost:5000/api";
 
@@ -123,6 +125,7 @@ function StatCard({
 function App() {
   const [activePage, setActivePage] = useState<ActivePage>("dashboard");
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
+  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -247,9 +250,23 @@ function App() {
               }}
             />
           )}
-          {activePage === "assets" && <AssetsPage />}
+
+          {activePage === "assets" && (
+            <AssetsPage
+              onViewAsset={(assetId) => {
+                setSelectedAssetId(assetId);
+                setActivePage("asset-detail");
+              }}
+            />
+          )}
           {activePage === "create-ticket" && <CreateTicketPage />}
           {activePage === "create-asset" && <CreateAssetPage />}
+          {activePage === "asset-detail" && selectedAssetId && (
+            <AssetDetailPage
+              assetId={selectedAssetId}
+              onBack={() => setActivePage("assets")}
+            />
+          )}
           {activePage === "ticket-detail" && selectedTicketId && (
             <TicketDetailPage
               ticketId={selectedTicketId}
