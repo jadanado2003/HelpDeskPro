@@ -6,6 +6,7 @@ import assetRoutes from "./routes/assets.routes";
 import ticketRoutes from "./routes/tickets.routes";
 import dashboardRoutes from "./routes/dashboard.routes";
 import { errorHandler } from "./middleware/errorHandler";
+import authRoutes from "./routes/auth.routes";
 
 export const app = express();
 
@@ -22,6 +23,7 @@ app.use("/api/health", healthRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/assets", assetRoutes);
 app.use("/api/tickets", ticketRoutes);
+app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
 app.use((req, res) => {
