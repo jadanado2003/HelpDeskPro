@@ -1,170 +1,175 @@
-\# HelpDeskPro
-
-
+# HelpDeskPro
 
 HelpDeskPro is a full-stack IT helpdesk ticketing and asset management system built to simulate real-world ICT support workflows.
 
+The application allows users to manage support tickets, IT assets, users, ticket comments, internal notes, status updates, priority changes, dashboard analytics, authentication, and role-based permissions.
 
+This project was built as a portfolio project to demonstrate practical full-stack development skills in a realistic IT service desk environment.
 
-The project is designed for managing support tickets, technicians, users, IT assets, ticket priorities, ticket statuses, internal notes, and dashboard analytics.
+---
 
+## Project Purpose
 
+I built HelpDeskPro to demonstrate that I can design and develop a realistic business application using modern full-stack technologies.
 
-\## Purpose
+The project is based on common workflows used by IT support teams, including:
 
+- Creating and managing support tickets
+- Tracking ticket priority and status
+- Linking tickets to IT assets
+- Adding comments and internal support notes
+- Viewing ticket activity history
+- Managing users and roles
+- Managing laptops, monitors, printers, phones, and other IT assets
+- Viewing dashboard statistics for tickets and assets
+- Securing backend routes with JWT authentication
+- Applying role-based backend permission checks
 
+HelpDeskPro is designed to be more than a basic CRUD app. It shows how software can support real ICT service desk operations.
 
-I built HelpDeskPro to demonstrate practical full-stack software development skills while connecting the project to real ICT workplace scenarios.
+---
 
+## Current Features
 
+### Authentication
 
-The system is designed to show skills in:
+- Login page for demo users
+- JWT-based backend authentication
+- Protected backend API routes
+- Frontend session handling using local storage
+- Logout functionality
+- Authenticated user display in the sidebar
 
+### Role-Based Access
 
+The backend includes role-based permission checks.
 
-\- React and TypeScript frontend development
+Current roles:
 
-\- Node.js and Express backend development
+- Admin
+- Technician
+- Requester
 
-\- REST API design
+Examples of permission rules:
 
-\- PostgreSQL database modelling
+- Admin users can create users
+- Admins and technicians can manage assets
+- Admins and technicians can update ticket status and priority
+- Requesters can create tickets and add comments
+- Protected routes require a valid JWT token
 
-\- Prisma ORM usage
+### Dashboard
 
-\- Authentication and role-based access control
+The dashboard displays live statistics from the backend and PostgreSQL database, including:
 
-\- IT support ticket workflows
-
-\- Asset management workflows
-
-\- Dashboard analytics
-
-\- AI-assisted productivity features
-
-
-
-\## Planned Core Features
-
-
-
-\- Create, update, view, and delete IT support tickets
-
-\- Assign ticket priority: Low, Medium, High, Critical
-
-\- Track ticket status: Open, In Progress, Resolved, Closed
-
-\- Assign tickets to technicians
-
-\- Link tickets to IT assets
-
-\- Add internal notes to tickets
-
-\- Search and filter tickets
-
-\- Manage IT assets such as laptops, desktops, phones, monitors, printers, and network devices
-
-\- Track asset serial numbers, condition, warranty expiry, and assigned users
-
-\- Dashboard showing ticket and asset statistics
-
-\- Authentication for users, technicians, and admins
-
-\- Role-based access control
-
-\- AI-assisted ticket categorisation, priority suggestions, summaries, and response drafting
-
-
-
-\## Tech Stack
-
-
-
-\### Frontend
-
-
-
-\- React
-
-\- TypeScript
-
-\- Vite
-
-\- React Router
-
-\- Axios
-
-\- Tailwind CSS
-
-\- Lucide React
-
-
-
-\### Backend
-
-
-
-\- Node.js
-
-\- Express
-
-\- TypeScript
-
-\- Prisma
-
-\- PostgreSQL
-
-\- Zod
-
-\- JSON Web Tokens
-
-\- bcryptjs
-
-
-
-\## Project Status
-
-
-
-HelpDeskPro is currently in active development.
-
-
-
-\## Why This Project Matters
-
-
-
-HelpDeskPro is not a basic student CRUD app. It is designed around a realistic business workflow used in IT teams and service desk environments.
-
-
-
-The project demonstrates both technical development ability and understanding of how software supports real workplace operations.
-
-
-
-\## Future Improvements
-
-
-
-\- File attachments for tickets
-
-\- SLA tracking
-
-\- CSV export
-
-\- Ticket activity timeline
-
-\- Email notification simulation
-
-\- AI-powered ticket summaries
-
-\- AI-powered priority and category suggestions
-
-\- AI-assisted technician response drafts
-
-\- Automated tests
-
-\- Docker setup
-
-\- Live deployment
-
+- Total tickets
+- Tickets in progress
+- Critical tickets
+- Total assets
+- Recent tickets
+- Ticket status distribution
+
+### User Management
+
+- View users
+- Search users
+- Create new users
+- Display user role, department, job title, and account status
+
+### Ticket Management
+
+- View all tickets
+- Search tickets
+- Create new tickets
+- View detailed ticket records
+- Link tickets to requesters, technicians, and assets
+- Update ticket status
+- Update ticket priority
+- Add comments
+- Add internal notes
+- View ticket activity history
+- View SLA-related dates such as due date, resolved date, and closed date
+
+### Asset Management
+
+- View IT assets
+- Search assets
+- Create new assets
+- View detailed asset records
+- Track asset tag, serial number, type, status, condition, and location
+- Track purchase date and warranty expiry date
+- Assign assets to users
+- View related tickets linked to an asset
+
+### Demo Data
+
+The project includes a seed script that creates demo users, assets, tickets, comments, and ticket activity history.
+
+Demo users include:
+
+- Admin user
+- Technician user
+- Requester user
+
+---
+
+## Tech Stack
+
+### Frontend
+
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- Axios
+- Lucide React
+
+### Backend
+
+- Node.js
+- Express
+- TypeScript
+- Prisma ORM
+- PostgreSQL
+- Supabase PostgreSQL
+- Zod
+- JSON Web Tokens
+- bcryptjs
+
+### Development Tools
+
+- Git
+- GitHub
+- npm
+- Vite
+- Prisma CLI
+
+---
+
+## Project Structure
+
+```text
+HelpDeskPro/
+├── client/
+│   ├── src/
+│   │   ├── pages/
+│   │   ├── App.tsx
+│   │   └── index.css
+│   └── package.json
+│
+├── server/
+│   ├── prisma/
+│   │   ├── schema.prisma
+│   │   ├── seed.ts
+│   │   └── migrations/
+│   ├── src/
+│   │   ├── middleware/
+│   │   ├── routes/
+│   │   ├── validators/
+│   │   ├── utils/
+│   │   ├── lib/
+│   │   ├── app.ts
+│   │   └── server.ts
+│   └── package.json
+│
+└── README.md
