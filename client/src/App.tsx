@@ -8,11 +8,11 @@ import {
   Clock3,
   Laptop,
   LayoutDashboard,
+  LogOut,
   PlusCircle,
   Ticket,
   Users,
   UserPlus,
-  LogOut,
   type LucideIcon,
 } from "lucide-react";
 import "./index.css";
@@ -92,7 +92,7 @@ type AuthUser = {
   isActive: boolean;
 };
 
-  type ActivePage =
+type ActivePage =
   | "dashboard"
   | "users"
   | "create-user"
@@ -153,40 +153,61 @@ function App() {
   );
 
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(() => {
-  const storedUser = localStorage.getItem("helpdeskpro_user");
+    const storedUser = localStorage.getItem("helpdeskpro_user");
 
-  if (!storedUser) {
-    return null;
+    if (!storedUser) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(storedUser) as AuthUser;
+    } catch {
+      localStorage.removeItem("helpdeskpro_user");
+      return null;
+    }
+  });
+
+  function handleLogin(token: string, user: AuthUser) {
+    localStorage.setItem("helpdeskpro_token", token);
+    localStorage.setItem("helpdeskpro_user", JSON.stringify(user));
+    axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+    setAuthToken(token);
+    setCurrentUser(user);
+    setActivePage("dashboard");
+    setSelectedTicketId(null);
+    setSelectedAssetId(null);
   }
 
-  try {
-    return JSON.parse(storedUser) as AuthUser;
-  } catch {
+  function handleLogout() {
+    localStorage.removeItem("helpdeskpro_token");
     localStorage.removeItem("helpdeskpro_user");
-    return null;
+    delete axios.defaults.headers.common.Authorization;
+    setAuthToken(null);
+    setCurrentUser(null);
+    setStats(null);
+    setActivePage("dashboard");
+    setSelectedTicketId(null);
+    setSelectedAssetId(null);
   }
-});
 
-function handleLogin(token: string, user: AuthUser) {
-  localStorage.setItem("helpdeskpro_token", token);
-  localStorage.setItem("helpdeskpro_user", JSON.stringify(user));
-  setAuthToken(token);
-  setCurrentUser(user);
-  setActivePage("dashboard");
-}
-
-function handleLogout() {
-  localStorage.removeItem("helpdeskpro_token");
-  localStorage.removeItem("helpdeskpro_user");
-  setAuthToken(null);
-  setCurrentUser(null);
-  setActivePage("dashboard");
-  setSelectedTicketId(null);
-  setSelectedAssetId(null);
-}
+  useEffect(() => {
+    if (authToken) {
+      axios.defaults.headers.common.Authorization = `Bearer ${authToken}`;
+    } else {
+      delete axios.defaults.headers.common.Authorization;
+    }
+  }, [authToken]);
 
   useEffect(() => {
     async function loadDashboardStats() {
+      if (!authToken || !currentUser) {
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      setErrorMessage("");
+
       try {
         const response = await axios.get<ApiResponse<DashboardStats>>(
           `${API_BASE_URL}/dashboard/stats`
@@ -203,11 +224,11 @@ function handleLogout() {
     }
 
     loadDashboardStats();
-  }, []);
+  }, [authToken, currentUser]);
 
-    if (!authToken || !currentUser) {
-      return <LoginPage onLogin={handleLogin} />;
-    }
+  if (!authToken || !currentUser) {
+    return <LoginPage onLogin={handleLogin} />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-100">
@@ -255,8 +276,8 @@ function handleLogout() {
               onClick={() => setActivePage("create-user")}
               className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium ${
                 activePage === "create-user"
-                ? "bg-white/10 text-white"
-                : "text-slate-300 hover:bg-white/5 hover:text-white"
+                  ? "bg-white/10 text-white"
+                  : "text-slate-300 hover:bg-white/5 hover:text-white"
               }`}
             >
               <UserPlus size={18} />
@@ -314,7 +335,6 @@ function handleLogout() {
               <Boxes size={18} />
               Assets
             </button>
-
           </nav>
 
           <div className="mt-10 rounded-2xl bg-white/10 p-4">
@@ -333,8 +353,6 @@ function handleLogout() {
               Logout
             </button>
           </div>
-
-
         </aside>
 
         <main className="flex-1 px-5 py-6 lg:px-8">
@@ -355,22 +373,25 @@ function handleLogout() {
               }}
             />
           )}
+
           {activePage === "create-ticket" && <CreateTicketPage />}
           {activePage === "create-asset" && <CreateAssetPage />}
+          {activePage === "users" && <UsersPage />}
+          {activePage === "create-user" && <CreateUserPage />}
+
           {activePage === "asset-detail" && selectedAssetId && (
             <AssetDetailPage
               assetId={selectedAssetId}
               onBack={() => setActivePage("assets")}
             />
           )}
+
           {activePage === "ticket-detail" && selectedTicketId && (
             <TicketDetailPage
               ticketId={selectedTicketId}
               onBack={() => setActivePage("tickets")}
             />
           )}
-          {activePage === "users" && <UsersPage />}
-          {activePage === "create-user" && <CreateUserPage />}
 
           {activePage === "dashboard" && (
             <>

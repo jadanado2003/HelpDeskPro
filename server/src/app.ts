@@ -7,6 +7,7 @@ import ticketRoutes from "./routes/tickets.routes";
 import dashboardRoutes from "./routes/dashboard.routes";
 import { errorHandler } from "./middleware/errorHandler";
 import authRoutes from "./routes/auth.routes";
+import { requireAuth } from "./middleware/auth.middleware";
 
 export const app = express();
 
@@ -20,11 +21,12 @@ app.use(
 app.use(express.json({ limit: "1mb" }));
 
 app.use("/api/health", healthRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/assets", assetRoutes);
-app.use("/api/tickets", ticketRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/api/dashboard", dashboardRoutes);
+
+app.use("/api/users", requireAuth, userRoutes);
+app.use("/api/assets", requireAuth, assetRoutes);
+app.use("/api/tickets", requireAuth, ticketRoutes);
+app.use("/api/dashboard", requireAuth, dashboardRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
