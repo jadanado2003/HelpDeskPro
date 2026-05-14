@@ -6,6 +6,7 @@ import { validateBody } from "../middleware/validate";
 import { asyncHandler } from "../utils/asyncHandler";
 import { HttpError } from "../utils/httpError";
 import { loginSchema } from "../validators/auth.validators";
+import { requireAuth } from "../middleware/auth.middleware";
 
 const router = Router();
 
@@ -74,6 +75,19 @@ router.post(
           jobTitle: user.jobTitle,
           isActive: user.isActive,
         },
+      },
+    });
+  })
+);
+
+router.get(
+  "/me",
+  requireAuth,
+  asyncHandler(async (_req, res) => {
+    res.json({
+      success: true,
+      data: {
+        user: res.locals.currentUser,
       },
     });
   })
