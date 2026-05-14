@@ -10,6 +10,8 @@ type AuthTokenPayload = JwtPayload & {
   email: string;
 };
 
+type Role = "ADMIN" | "TECHNICIAN" | "REQUESTER";
+
 function getJwtSecret(): Secret {
   const jwtSecret = process.env.JWT_SECRET;
 
@@ -34,12 +36,15 @@ export async function requireAuth(
 
     const token = authHeader.replace("Bearer ", "").trim();
 
-    const decoded = jwt.verify(token, getJwtSecret()) as string | JwtPayload;
+    let decoded: string | JwtPayload;
 
-    if (
-      typeof decoded === "string" ||
-      typeof decoded.sub !== "string"
-    ) {
+    try {
+      decoded = jwt.verify(token, getJwtSecret()) as string | JwtPayload;
+    } catch {
+      throw new HttpError(401, "Invalid or expired authentication token.");
+    }
+
+    if (typeof decoded === "string" || typeof decoded.sub !== "string") {
       throw new HttpError(401, "Invalid authentication token.");
     }
 
@@ -72,4 +77,27 @@ export async function requireAuth(
   } catch (error) {
     next(error);
   }
+}
+
+export function requireRole(...allowedRoles: Role[]) {
+  return (_req: Request, res: Response, next: NextFunction) => {
+    try {
+      const currentUser = res.locals.currentUser as { role?: Role } | undefined;
+
+      if (!currentUser) {
+        throw new HttpError(401, "Authentication is required.");
+      }
+
+      if (!currentUser.role || !allowedRoles.includes(currentUser.role)) {
+        throw new HttpError(
+          403,
+          "You do not have permission to perform this action."
+        );
+      }
+
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
 }

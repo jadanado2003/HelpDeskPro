@@ -9,6 +9,7 @@ import { prisma } from "../lib/prisma";
 import { validateBody } from "../middleware/validate";
 import { asyncHandler } from "../utils/asyncHandler";
 import { HttpError } from "../utils/httpError";
+import { requireRole } from "../middleware/auth.middleware";
 
 import {
   createTicketCommentSchema,
@@ -220,6 +221,7 @@ router.post(
 
 router.patch(
   "/:id",
+  requireRole("ADMIN", "TECHNICIAN"),
   validateBody(updateTicketSchema),
   asyncHandler(async (req, res) => {
     const ticketId = getRouteParam(req.params.id, "ticket id");

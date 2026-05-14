@@ -6,6 +6,7 @@ import { validateBody } from "../middleware/validate";
 import { asyncHandler } from "../utils/asyncHandler";
 import { HttpError } from "../utils/httpError";
 import { createUserSchema } from "../validators/user.validators";
+import { requireRole } from "../middleware/auth.middleware";
 
 const router = Router();
 
@@ -86,6 +87,7 @@ router.get(
 
 router.post(
   "/",
+  requireRole("ADMIN"),
   validateBody(createUserSchema),
   asyncHandler(async (req, res) => {
     const data = req.body;
